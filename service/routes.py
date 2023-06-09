@@ -61,6 +61,7 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
+
 @app.route("/accounts", methods=["GET"])
 def list_all_accounts():
     """
@@ -79,6 +80,7 @@ def list_all_accounts():
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
+
 
 @app.route("/accounts/<int:account_id>", methods=["GET"])
 def read_an_account(account_id: int):
@@ -108,7 +110,7 @@ def update_an_account(account_id: int):
     app.logger.info(f"Request to read an Account with id: {account_id}")
     check_content_type("application/json")
     account = Account.find(account_id)
-        
+
     if not account:
         abort(
             status.HTTP_404_NOT_FOUND,
@@ -137,10 +139,10 @@ def delete_an_account(account_id: int):
     app.logger.info(f"Request to read an Account with id: {account_id}")
     check_content_type("application/json")
     account = Account.find(account_id)
-        
+
     if account:
-         account.delete()
-    
+        account.delete()
+
     return make_response(
         "", status.HTTP_204_NO_CONTENT
     )
