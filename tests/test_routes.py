@@ -181,7 +181,7 @@ class TestAccountService(TestCase):
 
     def test_read_bad_account(self):
         """It should return a 404 error if account is non-existent"""
-        resp = self.client.patch(f"{BASE_URL}/1", content_type="application/json")
+        resp = self.client.patch(f"{BASE_URL}/0", content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_update_account(self):
@@ -206,5 +206,27 @@ class TestAccountService(TestCase):
         """It should return a 404 error if account is non-existent"""
         account = AccountFactory()
 
-        resp = self.client.patch(f"{BASE_URL}/1", json=account.serialize(), content_type="application/json")
+        resp = self.client.patch(f"{BASE_URL}/0", json=account.serialize(), content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_account(self):
+        account = AccountFactory()
+        response = self.client.post(
+            BASE_URL,
+            json=account.serialize(),
+            content_type="application/json"
+        )
+        new_account = response.get_json()
+
+        resp = self.client.delete(f"{BASE_URL}/{new_account['id']}", content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_patch_not_allowed_on_base(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.patch(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_delete_not_allowed_on_base(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.delete(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
