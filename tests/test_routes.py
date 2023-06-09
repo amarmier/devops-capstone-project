@@ -124,3 +124,37 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # ADD YOUR TEST CASES HERE ...
+    def test_list_all_accounts(self):
+        """It should list all Accounts"""
+        account_a = AccountFactory()
+        account_b = AccountFactory()
+
+        response_a = self.client.post(
+            BASE_URL,
+            json=account_a.serialize(),
+            content_type="application/json"
+        )
+
+        response_b = self.client.post(
+            BASE_URL,
+            json=account_b.serialize(),
+            content_type="application/json"
+        )
+
+        resp = self.client.get(BASE_URL, content_type="application/json")
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data[0]["name"], account_a.name)
+        self.assertEqual(data[1]["name"], account_b.name)
+
+    def test_empty_list_accounts(self):
+        resp = self.client.get(BASE_URL, content_type="application/json")
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        self.assertEqual(len(data), 0)
+
