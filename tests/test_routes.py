@@ -7,6 +7,7 @@ Test cases can be run with the following:
 """
 import os
 import logging
+import factory
 from unittest import TestCase
 from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
@@ -180,5 +181,30 @@ class TestAccountService(TestCase):
 
     def test_read_bad_account(self):
         """It should return a 404 error if account is non-existent"""
-        resp = self.client.get(f"{BASE_URL}/1", content_type="application/json")
+        resp = self.client.patch(f"{BASE_URL}/1", content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_account(self):
+        """It should update Account with new data"""
+        account = AccountFactory()
+        response = self.client.post(
+            BASE_URL,
+            json=account.serialize(),
+            content_type="application/json"
+        )
+        new_account = response.get_json()
+
+        account_update = AccountFactory()
+
+        resp = self.client.patch(f"{BASE_URL}/{new_account['id']}", json=account_update.serialize(), content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+
+        self.assertEqual(data["email"], account_update.email)
+
+    def test_update_bad_account(self):
+        """It should return a 404 error if account is non-existent"""
+        account = AccountFactory()
+
+        resp = self.client.patch(f"{BASE_URL}/1", json=account.serialize(), content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
