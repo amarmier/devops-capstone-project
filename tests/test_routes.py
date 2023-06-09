@@ -220,3 +220,13 @@ class TestAccountService(TestCase):
 
         resp = self.client.delete(f"{BASE_URL}/{new_account['id']}", content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_patch_not_allowed_on_base(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.patch(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_delete_not_allowed_on_base(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.delete(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
