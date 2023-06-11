@@ -7,7 +7,6 @@ Test cases can be run with the following:
 """
 import os
 import logging
-import factory
 from unittest import TestCase
 from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
@@ -134,13 +133,13 @@ class TestAccountService(TestCase):
         account_a = AccountFactory()
         account_b = AccountFactory()
 
-        response_a = self.client.post(
+        self.client.post(
             BASE_URL,
             json=account_a.serialize(),
             content_type="application/json"
         )
 
-        response_b = self.client.post(
+        self.client.post(
             BASE_URL,
             json=account_b.serialize(),
             content_type="application/json"
@@ -149,7 +148,7 @@ class TestAccountService(TestCase):
         resp = self.client.get(BASE_URL, content_type="application/json")
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        
+
         data = resp.get_json()
         self.assertEqual(len(data), 2)
         self.assertEqual(data[0]["name"], account_a.name)
@@ -200,7 +199,11 @@ class TestAccountService(TestCase):
 
         account_update = AccountFactory()
 
-        resp = self.client.patch(f"{BASE_URL}/{new_account['id']}", json=account_update.serialize(), content_type="application/json")
+        resp = self.client.patch(
+            f"{BASE_URL}/{new_account['id']}",
+            json=account_update.serialize(),
+            content_type="application/json"
+            )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
 
